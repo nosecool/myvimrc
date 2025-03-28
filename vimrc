@@ -33,6 +33,8 @@ Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'vim-scripts/a.vim'
 Plugin 'inkarkat/vim-mark'
 Plugin 'inkarkat/vim-ingo-library'
+Plugin 'ycm-core/YouCompleteMe'
+Plugin 'dense-analysis/ale'
 
 " ----- Working with Git ----------------------------------------------
 Plugin 'airblade/vim-gitgutter'
@@ -115,6 +117,17 @@ command! Wqa wqa
 command! W w
 command! Q q
 
+
+" Make navigating long, wrapped lines behave like normal lines
+noremap <silent> k gk
+noremap <silent> j gj
+noremap <silent> 0 g0
+noremap <silent> $ g$
+noremap <silent> ^ g^
+noremap <silent> _ g_
+
+
+
 " use 'Y' to yank to the end of a line, instead of the whole line
 noremap <silent> Y y$
 
@@ -156,7 +169,7 @@ let g:airline_theme='gruvbox'
 " Open/close NERDTree Tabs with \t
 nmap <silent> <leader>t :NERDTreeTabsToggle<CR>
 " To have NERDTree always open on startup
-let g:nerdtree_tabs_open_on_console_startup = 1
+"let g:nerdtree_tabs_open_on_console_startup = 1
 
 
 " ----- scrooloose/syntastic settings -----
@@ -182,7 +195,7 @@ set tags=./tags;,~/.vimtags
 if filereadable("./cscope.out")
   cs add cscope.out
 endif
-set csverb
+"set csverb
 nmap <C-@>s :cs find s <C-R>=expand("<cword>")<CR><CR>
 nmap <C-@>g :cs find g <C-R>=expand("<cword>")<CR><CR>
 nmap <C-@>c :cs find c <C-R>=expand("<cword>")<CR><CR>
@@ -191,6 +204,21 @@ nmap <C-@>e :cs find e <C-R>=expand("<cword>")<CR><CR>
 nmap <C-@>f :cs find f <C-R>=expand("<cword>")<CR><CR>
 nmap <C-@>i :cs find i <C-R>=expand("<cword>")<CR><CR>
 nmap <C-@>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+
+" ---- GNU Global Source Code Tag System ----
+if filereadable("GTAGS")
+  set cscopetag
+  set cscopeprg=gtags-cscope
+  cs add GTAGS
+  "au BufWritePost *.c,*.cpp,*.h silent! !gtags -f file.list
+endif
+nmap <silent> <leader>jd :cs find g <C-R>=expand("<cword>")<CR><CR>
+nmap <silent> <leader>jr :cs find s <C-R>=expand("<cword>")<CR><CR>
+nmap <silent> <leader>jc :cs find c <C-R>=expand("<cword>")<CR><CR>
+nmap <silent> <leader>jt :cs find t <C-R>=expand("<cword>")<CR><CR>
+nmap <silent> <leader>jf :cs find f <C-R>=expand("<cword>")<CR><CR>
+set tags=/.tags
+set csverb
 
 " ----- majutsushi/tagbar settings -----
 " Open/close tagbar with \b
@@ -218,3 +246,39 @@ augroup END
 " better man page support
 noremap K :SuperMan <cword><CR>
 
+" ---- YCM ----
+let g:ycm_server_python_interpreter='/usr/bin/python3'
+let g:ycm_global_ycm_extra_conf='~/.vim/.ycm_extra_conf.py'
+let g:ycm_confirm_extra_conf=0
+let g:ycm_collect_identifiers_from_tags_files = 1
+let g:ycm_seed_identifiers_with_syntax = 1
+set completeopt=menu,menuone
+let g:ycm_add_preview_to_completeopt = 0
+let g:ycm_show_diagnostics_ui = 0
+let g:ycm_server_log_level = 'info'
+let g:ycm_min_num_identifier_candidate_chars = 2  " 两个字符触发 补全
+let g:ycm_collect_identifiers_from_comments_and_strings = 1 " 收集
+let g:ycm_complete_in_strings=1
+let g:ycm_semantic_triggers =  {
+      \ 'c,cpp,python,java,go': ['re!\w{2}'],
+      \ }
+
+
+" ---- ALE ----
+let g:ale_sign_column_always = 1
+"let g:ale_sign_error = '✗'
+"let g:ale_sign_warning = '!'
+let g:ale_lint_on_text_changed = 'normal'
+let g:ale_lint_on_enter = 1
+"let g:ale_statusline_format = [ '   %d', '    %d', '    OK']
+let g:ale_echo_msg_format = '[%linter%] %code%: %%s'
+let g:ale_lint_on_insert_leave = 1
+let g:ale_c_gcc_options = '-Wall -O2 -std=c99'
+" Disable whitespace warnings
+let g:ale_warn_about_trailing_whitespace = 0
+let g:ale_linters = {
+      \ 'c' : ['clang'],
+      \ 'python' : ['pylint'],
+      \}
+
+"echo "Sourced .vimrc"
